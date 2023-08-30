@@ -1,0 +1,17 @@
+1693210566110	Rename compilation unit 'ProductController.java'
+1693210580148	Rename compilation unit 'ProductDao.java'
+1693210601353	Rename compilation unit 'ProductAddRequest.java'
+1693210622068	Rename compilation unit 'Product.java'
+1693210634315	Rename compilation unit 'ProductService.java'
+1693210646107	Rename compilation unit 'ProductServiceImpl.java'
+1693212064321	Rename package 'com.autopartshub'
+1693212073966	Rename package 'com.autopartshub.controller'
+1693212085997	Rename package 'com.autopartshub.dao'
+1693212095017	Rename package 'com.autopartshub.dto'
+1693212105595	Rename package 'com.autopartshub.model'
+1693212114889	Rename package 'com.autopartshub.service'
+1693212123504	Rename package 'com.autopartshub.security'
+1693212131968	Rename package 'com.autopartshub.utility'
+1693212537526	Rename package 'com.autopartshub.user.bookstack'
+1693212612976	Delete element
+1693213015997	Delete element

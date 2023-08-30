@@ -1,0 +1,58 @@
+package com.bookstack.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.autopartshub.utility.StorageService;
+import com.bookstack.dao.BookDao;
+import com.bookstack.model.Book;
+
+
+@Service
+public class BookServiceImpl implements BookService {
+	
+	@Autowired 
+	private BookDao bookDao;
+	
+	@Autowired
+	private StorageService storageService;
+
+	@Override
+	public void addBook(Book book, MultipartFile bookImmage) {
+		
+		String bookImageName = storageService.store(bookImmage);
+		
+		book.setImageName(bookImageName);
+		
+		this.bookDao.save(book);
+	}
+
+	
+	@Override
+	public void deleteBook(Book book) {
+	    // Delete the book image from the file system, if it exists
+	    if (book.getImageName() != null) {
+	        storageService.delete(book.getImageName());
+	    }
+	    
+	    // Delete the book from the database
+	    bookDao.delete(book);
+	}
+
+
+	@Override
+	public void updateBook(Book book, MultipartFile image) {
+	    if (!image.isEmpty()) {
+	        // Store the new image and update the book's image name
+	        String newImageName = storageService.store(image);
+	        book.setImageName(newImageName);
+	    }
+	    
+	    // Update the book's details
+	    this.bookDao.save(book);
+	}
+
+
+
+}

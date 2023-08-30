@@ -1,0 +1,112 @@
+package com.autopartshub.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.autopartshub.dao.CartDao;
+import com.autopartshub.dao.BookDao;
+import com.autopartshub.dao.UserDao;
+import com.autopartshub.dto.AddToCartRequest;
+import com.autopartshub.dto.CartDataResponse;
+import com.autopartshub.dto.CartResponse;
+import com.autopartshub.model.Cart;
+import com.autopartshub.model.Book;
+import com.autopartshub.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+
+@Service
+public class CartServiceImpl implements CartService {
+	
+	 @Autowired
+	    private CartDao cartDao;
+
+	    @Autowired
+	    private UserDao userDao;
+
+	    @Autowired
+	    private BookDao bookDao;
+	    
+	    
+
+	@Override
+	public void addToCart(AddToCartRequest addToCartRequest) {
+		
+		Optional<User> optionalUser = userDao.findById(addToCartRequest.getUserId());
+		User user = null;
+		if (optionalUser.isPresent()) {
+			user = optionalUser.get();
+		}
+
+		Optional<Book> optionalBook = bookDao.findById(addToCartRequest.getBookId());
+		Book book = null;
+		if (optionalBook.isPresent()) {
+			book = optionalBook.get();
+		}
+
+		Cart cart = new Cart();
+		cart.setBook(book);
+		cart.setQuantity(addToCartRequest.getQuantity());
+		cart.setUser(user);
+
+		cartDao.save(cart);
+
+
+	}
+
+	@Override
+	public CartResponse getMyCart(int userId) throws JsonProcessingException {
+		
+		List<CartDataResponse> cartDatas = new ArrayList<>();
+
+		List<Cart> userCarts = cartDao.findByUser_id(userId);
+
+		double totalCartPrice = 0;
+
+		for (Cart cart : userCarts) {
+			CartDataResponse cartData = new CartDataResponse();
+			cartData.setCartId(cart.getId());
+			cartData.setBookDescription(cart.getBook().getDescription());
+			cartData.setBookName(cart.getBook().getTitle());
+			cartData.setBookImage(cart.getBook().getImageName());
+			cartData.setQuantity(cart.getQuantity());
+			cartData.setBookId(cart.getBook().getId());
+
+			cartDatas.add(cartData);
+
+			double bookPrice = Double.parseDouble(cart.getBook().getPrice().toString());
+			// BigDecimal to a String and then to a double
+			// second approach double bookPrice =
+			// cart.getBook().getPrice().doubleValue();
+			totalCartPrice = totalCartPrice + (cart.getQuantity() * bookPrice);
+
+		}
+
+		CartResponse cartResponse = new CartResponse();
+		cartResponse.setTotalCartPrice(String.valueOf(totalCartPrice));
+		// good practice to send data in string or big d
+		// Instead of double
+		cartResponse.setCartData(cartDatas);
+		
+		return cartResponse;
+	}
+
+	@Override
+	public void removeCartItem(int cartId) {
+
+		Optional<Cart> optionalCart = this.cartDao.findById(cartId);
+		Cart cart = new Cart();
+
+		if (optionalCart.isPresent()) {
+			cart = optionalCart.get();
+		}
+
+		this.cartDao.delete(cart);
+
+	}
+
+}
